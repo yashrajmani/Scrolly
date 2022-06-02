@@ -1,17 +1,10 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'dart:io';
 
-Future<Meme> fetchMeme() async {
-  final response =
-      await http.get(Uri.parse('https://meme-api.herokuapp.com/gimme'));
-  if (response.statusCode == 200) {
-    return Meme.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to load meme');
-  }
-}
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:async';
+import 'package:scrolly/components/memeloader.dart';
+import 'package:scrolly/components/remoteservice.dart';
 
 class Meme {
   String title;
@@ -39,29 +32,63 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Future<Meme> futureMeme;
+  bool close = false;
+  Future<bool> showExitPopup() async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Exit App'),
+            content: Text('Do you want to exit the App?'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: Text('No'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
 
   @override
   void initState() {
     super.initState();
-    futureMeme = fetchMeme();
+    futureMeme = RemoteService().fetchMeme() as Future<Meme>;
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = new PageController(initialPage: 999);
+    final controller = PageController(initialPage: 999);
 
     List<Widget> pages = [
-      MemeLoader(color: Colors.red),
-      MemeLoader(color: Colors.blue),
-      MemeLoader(color: Colors.green),
-      MemeLoader(color: Colors.purple),
-
+      MemeLoader(color: Colors.red.shade100),
+      MemeLoader(color: Colors.blue.shade100),
+      MemeLoader(color: Colors.green.shade100),
+      MemeLoader(color: Colors.purple.shade100),
     ];
 
-    return SafeArea(
+    return WillPopScope(
+      onWillPop: showExitPopup,
       child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Scroll Up For New",
+                style: TextStyle(
+              fontWeight: FontWeight.w400,
+          ),
+          ),
+          centerTitle: true,
+        ),
           bottomNavigationBar: BottomAppBar(
-              color: Colors.amberAccent,
+              color: Colors.amber,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -87,7 +114,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   IconButton(
                       onPressed: () {
                         print("CLOSE CLICKED!");
-                      },
+                          if (Platform.isAndroid) {
+                            SystemNavigator.pop();
+                          } else {
+                            exit(0);
+                          }
+                        },
                       icon: Icon(
                         Icons.close,
                         color: Colors.red,
@@ -103,73 +135,6 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           )),
-    );
-  }
-}
-
-
-
-
-//SETUP///////////////////////////////////////////////////////////
-class MemeLoader extends StatelessWidget {
-  MemeLoader({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
-
-  late Future<Meme> futureMeme;
-  final Color color;
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      color: color,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "BELOW IS MEME",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          FutureBuilder<Meme>(
-            future: futureMeme=fetchMeme(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Column(
-                  children: [
-                    Image.network(
-                      snapshot.data!.url,
-                      fit: BoxFit.contain,
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      height: MediaQuery.of(context).size.height * 0.7,
-                    ),
-                    Text(
-                      snapshot.data!.title,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
-            },
-          ),
-        ],
-      ),
     );
   }
 }
