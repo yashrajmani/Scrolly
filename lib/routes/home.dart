@@ -48,93 +48,127 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    PageController controller = PageController(initialPage: 0);
+    final controller = new PageController(initialPage: 999);
+
     List<Widget> pages = [
-      Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "BELOW IS MEME",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            FutureBuilder<Meme>(
-              future: futureMeme,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return SizedBox(
-                      width: 300,
-                      height: 300,
-                      child: Column(
-                        children: [
-                          Text(
-                            "CAPTION : "+snapshot.data!.title,
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                          Image.network(snapshot.data!.url),
-                        ],
-                      ));
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
+      MemeLoader(color: Colors.red),
+      MemeLoader(color: Colors.blue),
+      MemeLoader(color: Colors.green),
+      MemeLoader(color: Colors.purple),
 
-                // By default, show a loading spinner.
-                return const CircularProgressIndicator();
-              },
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  print("RELOAD CLICKED!");
-                  setState((){
-                    futureMeme=fetchMeme(); // Set state like this
-                  });
-
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Reload"),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Icon(Icons.refresh),
-                  ],
-                ))
-          ],
-        ),
-      ),
-      Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.yellow),
-      Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.green),
-      Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.blue)
     ];
 
     return SafeArea(
       child: Scaffold(
-        body: PageView(
-          controller: controller,
-          scrollDirection: Axis.vertical,
-          children: pages,
-        ),
+          bottomNavigationBar: BottomAppBar(
+              color: Colors.amberAccent,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        print("SEND CLICKED!");
+                      },
+                      icon: Icon(
+                        Icons.send,
+                        color: Colors.blue,
+                      )),
+                  SizedBox(
+                    height: 40,
+                    child: VerticalDivider(
+                      color: Colors.black,
+                      thickness: 2,
+                      indent: 5,
+                      endIndent: 2,
+                      width: 5,
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        print("CLOSE CLICKED!");
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.red,
+                      )),
+                ],
+              )),
+          body: PageView.builder(
+            controller: controller,
+            scrollDirection: Axis.vertical,
+            itemBuilder: (context, index) {
+              return new Center(
+                child: pages.elementAt(index % 4),
+              );
+            },
+          )),
+    );
+  }
+}
+
+
+
+
+//SETUP///////////////////////////////////////////////////////////
+class MemeLoader extends StatelessWidget {
+  MemeLoader({
+    Key? key,
+    required this.color,
+  }) : super(key: key);
+
+  late Future<Meme> futureMeme;
+  final Color color;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      color: color,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "BELOW IS MEME",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          FutureBuilder<Meme>(
+            future: futureMeme=fetchMeme(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  children: [
+                    Image.network(
+                      snapshot.data!.url,
+                      fit: BoxFit.contain,
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      height: MediaQuery.of(context).size.height * 0.7,
+                    ),
+                    Text(
+                      snapshot.data!.title,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            },
+          ),
+        ],
       ),
     );
   }
