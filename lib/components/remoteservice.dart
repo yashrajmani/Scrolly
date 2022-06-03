@@ -5,8 +5,7 @@ import 'package:scrolly/routes/home.dart';
 
 class RemoteService {
   Future<Meme> fetchMeme() async {
-    final response =
-    await http.get(Uri.parse('https://meme-api.herokuapp.com/gimme'));
+    final response = await http.get(Uri.parse('https://meme-api.herokuapp.com/gimme'));
     if (response.statusCode == 200) {
       return Meme.fromJson(jsonDecode(response.body));
     } else {

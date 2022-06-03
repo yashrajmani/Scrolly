@@ -1,4 +1,4 @@
-# scrolly
+# Scrolly- The Meme App
 
 A new Flutter project that uses pageview and  has full screen swipeable content.
 

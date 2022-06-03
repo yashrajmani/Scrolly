@@ -20,7 +20,7 @@ class MemeLoader extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 1,
           ),
           FutureBuilder<Meme>(
@@ -39,8 +39,8 @@ class MemeLoader extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(6.0),
                       child: Text(
-                        "*" + snapshot.data!.title.toString().toUpperCase() + "*",
-                        style: TextStyle(
+                        "*${snapshot.data!.title.toString().toUpperCase()}*",
+                        style: const TextStyle(
                           fontWeight: FontWeight.w300,
                           fontSize: 18,
                         ),

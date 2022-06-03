@@ -36,11 +36,15 @@ dependencies:
   cupertino_icons: ^1.0.2
   video_player: ^2.4.2
   http:
+  share_plus:
+  screenshot: ^1.2.3
+  path_provider: ^2.0.10
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  flutter_native_splash: ^2.2.2
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -48,6 +52,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+flutter_native_splash:
+  color: "#f0dd81"
+  image: assets/spalshimg.png
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

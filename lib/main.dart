@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:scrolly/main.dart';
 import 'routes/home.dart';
 
 void main() {
@@ -20,3 +20,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
